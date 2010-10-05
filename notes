@@ -1,0 +1,13 @@
+Login:
+ POST http://www.fitbug.com/login username=>$username password => $password, login=>LOGIN, member_login_btn.x=23 member_login_btn.y=>14
+
+"my $meal":
+ POST http://www.fitbug.com/uk.myfitbug.nutrition.mymeals
+  ajaxrequest=1
+  module=>start
+  data=>'{"section":"snacks"}'
+ --->
+ 
+
+
+POST /uk.mystats ajaxrequest=>1, module=>generate_flashs, data=>null
