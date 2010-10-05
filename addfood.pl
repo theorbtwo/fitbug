@@ -5,7 +5,7 @@ use warnings;
 
 use Getopt::Long;
 use Term::Prompt;
-use Data::Dumper;
+use Data::Dump::Streamer qw<Dump Dumper>;
 use FitBug;
 
 my %options = ();
@@ -13,12 +13,19 @@ my $result = GetOptions(
                         \%options,
                         "username=s",
                         "password=s",
-                        "mealtime:s",
+                        "meal:s",
                        );
 
+Dump $result;
+Dump \%options;
+
 my $food = shift;
-if(!$result || !$food) {
-    die "Usage: $0 --username=<fitbuguser> --password=<fitbugpasswd> [--mealtime={breakfast|lunch|dinner}] <search term>";
+if (!$result || !$food) {
+  die "Usage: $0 --username=<fitbuguser> --password=<fitbugpasswd> [--meal={breakfast|lunch|dinner|snacks}] <search term>";
+}
+
+if ($options{mealtime} && !($options{mealtime} ~~ [qw<breakfast lunch dinner snacks>])) {
+  die "--meal must be unspecified or one of breakfast, lunch, dinner, or snacks";
 }
 
 print "Looking for $food\n";
@@ -33,10 +40,11 @@ if(@$foods > 1) {
 }
 
 if(@$foods) {
-    print "Adding '$foods->[0]{desc}' to $foods->[0]{sect}\n";
-    FitBug::addmeal($foods->[0]{sect}, $foods->[0]{foundin}, $foods->[0]{id}, 1);
+  my $time = $options{meal} || $foods->[0]{sect};
+  print "Adding time_of_day = $time, from = $foods->[0]{foundin}, id = $foods->[0]{id}\n";
+  FitBug::addmeal($time, $foods->[0]{foundin}, $foods->[0]{id}, 1);
 } else {
-    print "No matches found. Giving up.\n";
+  print "No matches found. Giving up.\n";
 }
 
 
